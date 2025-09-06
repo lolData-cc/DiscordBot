@@ -9,7 +9,7 @@ import {
 
 export const data = new SlashCommandBuilder()
   .setName("panel")
-  .setDescription("Sends the help desk panel message")
+  .setDescription("Sends the partners panel message")
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 
 export async function execute(interaction) {
