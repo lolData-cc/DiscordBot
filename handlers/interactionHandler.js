@@ -7,6 +7,7 @@ import {
   ChannelType,
   ButtonBuilder,
   ButtonStyle,
+  AttachmentBuilder,
 } from "discord.js";
 import { supabase } from "../supabaseClient.js";
 
@@ -861,4 +862,192 @@ export async function streamerRejectSubmit(interaction) {
   });
 
   await interaction.channel.delete().catch(console.error);
+}
+
+// support tickets
+const TICKET_CATEGORY_LABELS = {
+  discord_support: "Discord Support",
+  website_support: "Website Support",
+  billing: "Billing",
+  other: "Other",
+};
+
+export async function showTicketModal(interaction) {
+  if (interaction.customId !== "help_ticket") return;
+  if (interaction.deferred || interaction.replied) return;
+
+  const selected = interaction.values?.[0];
+  if (!selected) {
+    await interaction.reply({ content: "Invalid selection.", ephemeral: true }).catch(() => {});
+    return;
+  }
+
+  const label = TICKET_CATEGORY_LABELS[selected] || "Support";
+
+  const modal = new ModalBuilder()
+    .setCustomId(`ticket_modal_${selected}`)
+    .setTitle(label);
+
+  const objectInput = new TextInputBuilder()
+    .setCustomId("ticket_object")
+    .setLabel("Object")
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder("Brief summary of your issue")
+    .setRequired(true);
+
+  const descriptionInput = new TextInputBuilder()
+    .setCustomId("ticket_description")
+    .setLabel("Description")
+    .setStyle(TextInputStyle.Paragraph)
+    .setPlaceholder("Describe your issue in detail")
+    .setRequired(true);
+
+  modal.addComponents(
+    new ActionRowBuilder().addComponents(objectInput),
+    new ActionRowBuilder().addComponents(descriptionInput)
+  );
+
+  await interaction.showModal(modal);
+}
+
+export async function ticketSubmit(interaction) {
+  if (!interaction.customId.startsWith("ticket_modal_")) return;
+
+  const category = interaction.customId.replace("ticket_modal_", "");
+  const label = TICKET_CATEGORY_LABELS[category] || "Support";
+  const channel = interaction.channel;
+  if (!channel || !channel.isTextBased()) return;
+
+  const threadPrefix = label.toLowerCase().replace(/ /g, "-");
+
+  const { data: lastThreadData } = await supabase
+    .from("threads")
+    .select("thread_number")
+    .eq("category", category)
+    .order("thread_number", { ascending: false })
+    .limit(1)
+    .single();
+
+  const threadNumber = lastThreadData ? lastThreadData.thread_number + 1 : 1;
+  const paddedNumber = String(threadNumber).padStart(4, "0");
+
+  const objectValue = interaction.fields.getTextInputValue("ticket_object");
+  const descriptionValue = interaction.fields.getTextInputValue("ticket_description");
+
+  const infoEmbed = new EmbedBuilder()
+    .setColor("#01D38E")
+    .setDescription(
+      `## <:loldatasupport:1413069467776192593> ${label}\n<:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059>\n<@${interaction.user.id}> opened a ticket. The <:loldatasupport:1413069467776192593><@&${process.env.SUPPORT_ROLE_ID}> team will get back to you as soon as possible.\n\n\`Object\`\n\n${objectValue}\n\n\`Description\`\n\n${descriptionValue}`
+    );
+
+  const closeButton = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("ticket_close")
+      .setLabel("Close")
+      .setEmoji("<:loldatareject:1412576366943273022>")
+      .setStyle(ButtonStyle.Secondary)
+  );
+
+  const thread = await channel.threads.create({
+    name: `${threadPrefix}-${paddedNumber}`,
+    autoArchiveDuration: 1440,
+    type: ChannelType.PrivateThread,
+    invitable: false,
+  });
+
+  await thread.members.add(interaction.user.id).catch(console.error);
+
+  await supabase.from("threads").insert([{
+    thread_id: thread.id,
+    thread_number: threadNumber,
+    creator_id: interaction.user.id,
+    channel_id: thread.id,
+    category: category,
+  }]);
+
+  await thread.send({
+    content: `<@&${process.env.SUPPORT_ROLE_ID}>`,
+    embeds: [infoEmbed],
+    components: [closeButton],
+    allowedMentions: { roles: [process.env.SUPPORT_ROLE_ID] },
+  });
+
+  return interaction.reply({
+    embeds: [
+      new EmbedBuilder()
+        .setColor("#01D38E")
+        .setDescription(
+          `## <:loldatasuccess:1411943739836071967> Ticket opened: ${thread.url}\nThe <:loldatasupport:1413069467776192593><@&${process.env.SUPPORT_ROLE_ID}> team will get back to you as soon as possible.`
+        ),
+    ],
+    ephemeral: true,
+  });
+}
+
+export async function ticketClose(interaction) {
+  if (interaction.customId !== "ticket_close") return;
+
+  const { data: threadData } = await supabase
+    .from("threads")
+    .select("creator_id, thread_number, category")
+    .eq("channel_id", interaction.channel.id)
+    .single();
+
+  const isSupport = interaction.member.roles.cache.has(process.env.SUPPORT_ROLE_ID);
+  const isCreator = threadData && threadData.creator_id === interaction.user.id;
+
+  if (!isSupport && !isCreator) {
+    return interaction.reply({
+      embeds: [
+        new EmbedBuilder()
+          .setColor("#01D38E")
+          .setDescription("<:loldatadenied:1411943771477905479> You don't have permission to close this ticket."),
+      ],
+      ephemeral: true,
+    });
+  }
+
+  const messages = await interaction.channel.messages.fetch({ limit: 100 });
+  const sorted = [...messages.values()].reverse();
+
+  const transcript = sorted
+    .map((m) => {
+      const time = new Date(m.createdTimestamp).toISOString();
+      const content = m.content || (m.embeds.length ? "[embed]" : "[component]");
+      return `[${time}] ${m.author.tag}: ${content}`;
+    })
+    .join("\n");
+
+  const category = threadData?.category || "unknown";
+  const label = TICKET_CATEGORY_LABELS[category] || category;
+  const threadName = interaction.channel.name;
+  const paddedNumber = String(threadData?.thread_number || 0).padStart(4, "0");
+
+  const logChannelId = process.env.TICKET_LOG_CHANNEL_ID;
+  const logChannel = logChannelId ? interaction.guild.channels.cache.get(logChannelId) : null;
+
+  if (logChannel && logChannel.isTextBased()) {
+    const logEmbed = new EmbedBuilder()
+      .setColor("#01D38E")
+      .setDescription(
+        `## <:loldatasupport:1413069467776192593> Ticket Closed\n<:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059><:line:1413101899770626059>\n\`Ticket\` ${threadName}\n\`Category\` ${label}\n\`Opened by\` <@${threadData?.creator_id}>\n\`Closed by\` <@${interaction.user.id}>\n\`Messages\` ${sorted.length}`
+      );
+
+    const buffer = Buffer.from(transcript, "utf-8");
+    const attachment = new AttachmentBuilder(buffer, { name: `transcript-${threadName}.txt` });
+
+    await logChannel.send({ embeds: [logEmbed], files: [attachment] }).catch(console.error);
+  }
+
+  await interaction.reply({
+    embeds: [
+      new EmbedBuilder()
+        .setColor("#01D38E")
+        .setDescription("<:loldatasuccess:1411943739836071967> Ticket closed."),
+    ],
+    ephemeral: true,
+  });
+
+  await supabase.from("threads").delete().eq("channel_id", interaction.channel.id);
+  setTimeout(() => interaction.channel.delete().catch(console.error), 3000);
 }

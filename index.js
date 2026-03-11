@@ -19,6 +19,9 @@
     streamerApprove,
     streamerReject,
     streamerRejectSubmit,
+    showTicketModal,
+    ticketSubmit,
+    ticketClose,
   } from "./handlers/interactionHandler.js";
   import {
     cleanupEndedGiveaways,
@@ -99,6 +102,11 @@
         await streamerReject(interaction);
         return;
       }
+
+      if (interaction.customId === "ticket_close") {
+        await ticketClose(interaction);
+        return;
+      }
     }
 
     if (interaction.isChatInputCommand()) {
@@ -132,6 +140,10 @@
 
     // partner applications forms
     if (interaction.isStringSelectMenu()) {
+      if (interaction.customId === "help_ticket") {
+        await showTicketModal(interaction);
+        return;
+      }
       await showModal(interaction);
       return;
     }
@@ -154,6 +166,11 @@
 
       if (interaction.customId === "streamerRejectModal") {
         await streamerRejectSubmit(interaction);
+        return;
+      }
+
+      if (interaction.customId.startsWith("ticket_modal_")) {
+        await ticketSubmit(interaction);
         return;
       }
     }
