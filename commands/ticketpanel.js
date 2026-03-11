@@ -26,8 +26,7 @@ export async function execute(interaction) {
     "You can check the bot's commands by typing /help in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934). The list will be updated as new features come out.\n\n" +
     "```\nHow do I become a partner?\n```\n" +
     "You can apply for the partner program by opening a ticket in [partners](https://discord.com/channels/1400118983885324411/1410198632296349728). Keep in mind — you will need to meet some requirements before applying.\n\n" +
-    "```\nWhere can I read informations on this project?\n```\n" +
-    "### Keep in mind\nYou can read in depth informations about our project in [about](https://discord.com/channels/1400118983885324411/1410198427232501850) or consult the [documentation](https://loldata.cc/dashboard/documentation) on our website.\n\nDo not open multiple tickets for the same issue. Tickets opened for no valid reason will be closed without a response.\n\nIf you encountered a bug, please report it in [feedback](https://discord.com/channels/1400118983885324411/1407743733788835840)."
+    "```\nWhere can I read informations on this project?\n```\n### Keep in mind\nYou can read in depth informations about our project in [about](https://discord.com/channels/1400118983885324411/1410198427232501850) or consult the [documentation](https://loldata.cc/dashboard/documentation) on our website.\n\nDo not open multiple tickets for the same issue. Tickets opened for no valid reason will be closed without a response.\n\nIf you encountered a bug, please report it in [feedback](https://discord.com/channels/1400118983885324411/1407743733788835840)."
   );
 
   const menu = new StringSelectMenuBuilder()
