@@ -15,7 +15,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   const lines = "<:line:1413101899770626059>".repeat(27);
   const embed = new EmbedBuilder().setColor("#01D38E").setDescription(
-    `## <:loldatasupport:1413069467776192593> Help Desk\n${lines}\nIf you need assistance, select the category that best describes your issue and fill in the short form. A member of the <:loldatasupport:1413069467776192593><@&${process.env.SUPPORT_ROLE_ID}> team will get back to you as soon as possible.\n## FAQs\n` +
+    `## <:loldatasupport:1413069467776192593> Help Desk\n${lines}\nIf you need assistance, select the category that best describes your issue and fill in the short form.\n\nA member of the <:loldatasupport:1413069467776192593><@&${process.env.SUPPORT_ROLE_ID}> team or a <:loldatamod:1413069465658327112><@&${process.env.MOD_ROLE_ID}> will get back to you as soon as possible.\n## FAQs\n` +
     "```\nHow do I earn exp points on lolData's discord server?\n```\n" +
     "You can earn exp points by winning giveaways, chatting with other community members and being active in the server.\n\n" +
     "```\nHow do I check how many points I have?\n```\n" +
