@@ -111,78 +111,92 @@ export async function giveawayInteractions(interaction) {
 
 // partner applications
 export async function showModal(interaction) {
-  if (interaction.customId === "partners") {
-    const selectedCategory = interaction.values[0];
+  if (interaction.customId !== "partners") return;
 
-    const proForm = new ModalBuilder()
-      .setCustomId(`proform`)
-      .setTitle("Pro application");
+  if (interaction.deferred || interaction.replied) return;
 
-    const riotId = new TextInputBuilder()
-      .setCustomId("riot_id")
-      .setLabel("Riot ID")
-      .setPlaceholder("lolData#EUW")
-      .setStyle(TextInputStyle.Short)
-      .setRequired(true);
-
-    const nationality = new TextInputBuilder()
-      .setCustomId("nationality")
-      .setLabel("Country")
-      .setPlaceholder("Germany")
-      .setStyle(TextInputStyle.Short)
-      .setRequired(true);
-
-    const name = new TextInputBuilder()
-      .setCustomId("name")
-      .setLabel("Name (optional)")
-      .setPlaceholder("Name and last name")
-      .setStyle(TextInputStyle.Short)
-      .setRequired(false);
-
-    const team = new TextInputBuilder()
-      .setCustomId("team")
-      .setLabel("Team (optional)")
-      .setPlaceholder("G2 Esports")
-      .setStyle(TextInputStyle.Short)
-      .setRequired(false);
-
-    const other = new TextInputBuilder()
-      .setCustomId("other")
-      .setLabel("Informations (optional)")
-      .setPlaceholder("Any other detail you would like to provide")
-      .setStyle(TextInputStyle.Paragraph)
-      .setRequired(false);
-
-    const streamerForm = new ModalBuilder()
-      .setCustomId(`streamerform`)
-      .setTitle("Streamer application");
-
-    const inputStreamer = new TextInputBuilder()
-      .setCustomId("link")
-      .setLabel("Streaming URL")
-      .setPlaceholder("twitch.tv/loldata, kick.com/loldata, etc.")
-      .setStyle(TextInputStyle.Short)
-      .setRequired(true);
-
-    const rowStreamer = new ActionRowBuilder().addComponents(inputStreamer);
-
-    proForm.addComponents(
-      new ActionRowBuilder().addComponents(riotId),
-      new ActionRowBuilder().addComponents(nationality),
-      new ActionRowBuilder().addComponents(name),
-      new ActionRowBuilder().addComponents(team),
-      new ActionRowBuilder().addComponents(other)
-    );
-
-    streamerForm.addComponents(rowStreamer);
-
-    if (selectedCategory === "pro") {
-      await interaction.showModal(proForm);
-    } else if (selectedCategory === "streamer") {
-      await interaction.showModal(streamerForm);
-    }
+  const selectedCategory = interaction.values?.[0];
+  if (!selectedCategory) {
+    await interaction.reply({ content: "Selezione non valida.", ephemeral: true }).catch(() => { });
+    return;
   }
+
+  const proForm = new ModalBuilder()
+    .setCustomId("proform")
+    .setTitle("Pro application");
+
+  const riotId = new TextInputBuilder()
+    .setCustomId("riot_id")
+    .setLabel("Riot ID")
+    .setPlaceholder("lolData#EUW")
+    .setStyle(TextInputStyle.Short)
+    .setRequired(true);
+
+  const nationality = new TextInputBuilder()
+    .setCustomId("nationality")
+    .setLabel("Country")
+    .setPlaceholder("Germany")
+    .setStyle(TextInputStyle.Short)
+    .setRequired(true);
+
+  const name = new TextInputBuilder()
+    .setCustomId("name")
+    .setLabel("Name (optional)")
+    .setPlaceholder("Name and last name")
+    .setStyle(TextInputStyle.Short)
+    .setRequired(false);
+
+  const team = new TextInputBuilder()
+    .setCustomId("team")
+    .setLabel("Team (optional)")
+    .setPlaceholder("G2 Esports")
+    .setStyle(TextInputStyle.Short)
+    .setRequired(false);
+
+  const other = new TextInputBuilder()
+    .setCustomId("other")
+    .setLabel("Informations (optional)")
+    .setPlaceholder("Any other detail you would like to provide")
+    .setStyle(TextInputStyle.Paragraph)
+    .setRequired(false);
+
+  proForm.addComponents(
+    new ActionRowBuilder().addComponents(riotId),
+    new ActionRowBuilder().addComponents(nationality),
+    new ActionRowBuilder().addComponents(name),
+    new ActionRowBuilder().addComponents(team),
+    new ActionRowBuilder().addComponents(other)
+  );
+
+  const streamerForm = new ModalBuilder()
+    .setCustomId("streamerform")
+    .setTitle("Streamer application");
+
+  const inputStreamer = new TextInputBuilder()
+    .setCustomId("link")
+    .setLabel("Streaming URL")
+    .setPlaceholder("twitch.tv/loldata, kick.com/loldata, etc.")
+    .setStyle(TextInputStyle.Short)
+    .setRequired(true);
+
+  streamerForm.addComponents(new ActionRowBuilder().addComponents(inputStreamer));
+
+  if (selectedCategory === "pro") {
+    await interaction.showModal(proForm);
+    return;
+  }
+
+  if (selectedCategory === "streamer") {
+    await interaction.showModal(streamerForm);
+    return;
+  }
+
+  await interaction.reply({
+    content: "Categoria non valida.",
+    ephemeral: true,
+  }).catch(() => { });
 }
+
 
 export async function proSubmit(interaction) {
   if (interaction.customId === "proform") {
@@ -264,6 +278,28 @@ export async function proSubmit(interaction) {
       embeds: [infoEmbed],
       components: [approveReject],
     });
+
+    const { error: proAppErr } = await supabase.from("proApplications").insert([
+      {
+        guild_id: interaction.guildId,
+        creator_id: interaction.user.id,
+        thread_id: proThread.id,
+        thread_url: proThread.url,
+
+        riot_id: riotIdContent,
+        nationality: nationalityContent,
+        name: nameContent || null,
+        team: teamContent || null,
+        other: otherContent || null,
+
+        status: "pending",
+      },
+    ]);
+
+    if (proAppErr) {
+      console.error("Error inserting proApplications:", proAppErr);
+      // Non blocco l'utente: il thread è già creato, però segnalo in log.
+    }
 
     return interaction.reply({
       embeds: [
@@ -365,6 +401,15 @@ export async function proApprove(interaction) {
       ],
       ephemeral: true,
     });
+
+    await supabase
+      .from("proApplications")
+      .update({
+        status: "approved",
+        reviewed_at: new Date().toISOString(),
+        reviewer_id: interaction.user.id,
+      })
+      .eq("thread_id", interaction.channel.id);
 
     return interaction.channel.delete().catch(console.error);
   }
