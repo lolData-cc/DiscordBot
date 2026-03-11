@@ -15,18 +15,18 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   const lines = "<:line:1413101899770626059>".repeat(27);
   const embed = new EmbedBuilder().setColor("#01D38E").setDescription(
-    `## <:loldatasupport:1413069467776192593> Help Desk\n${lines}\nIf you need assistance, select the category that best describes your issue and fill in the short form. A member of the <:loldatasupport:1413069467776192593><@&${process.env.SUPPORT_ROLE_ID}> team will get back to you as soon as possible.\n\n## FAQs\n` +
-    "```\n How do I earn exp points on lolData's discord server? \n```\n" +
+    `## <:loldatasupport:1413069467776192593> Help Desk\n${lines}\nIf you need assistance, select the category that best describes your issue and fill in the short form. A member of the <:loldatasupport:1413069467776192593><@&${process.env.SUPPORT_ROLE_ID}> team will get back to you as soon as possible.\n## FAQs\n` +
+    "```\nHow do I earn exp points on lolData's discord server?\n```\n" +
     "You can earn exp points by winning giveaways, chatting with other community members and being active in the server.\n\n" +
-    "```\n How do I check how many points I have? \n```\n" +
+    "```\nHow do I check how many points I have?\n```\n" +
     "You can check your progress by typing /profile [(optional)username] in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934).\n\n" +
-    "```\n How do I check the Leaderboard? \n```\n" +
+    "```\nHow do I check the Leaderboard?\n```\n" +
     "You can check the server leaderboard by typing /leaderboard in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934).\n\n" +
-    "```\n How do I check all the available commands? \n```\n" +
+    "```\nHow do I check all the available commands?\n```\n" +
     "You can check the bot's commands by typing /help in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934). The list will be updated as new features come out.\n\n" +
-    "```\n How do I become a partner? \n```\n" +
+    "```\nHow do I become a partner?\n```\n" +
     "You can apply for the partner program by opening a ticket in [partners](https://discord.com/channels/1400118983885324411/1410198632296349728). Keep in mind — you will need to meet some requirements before applying.\n\n" +
-    "```\n Where can I read informations on this project? \n```\n" +
+    "```\nWhere can I read informations on this project?\n```\n" +
     "You can read in depth informations about our project in [about](https://discord.com/channels/1400118983885324411/1410198427232501850) or consult the [documentation](https://loldata.cc/dashboard/documentation) on our website.\n\n" +
     "Do not open multiple tickets for the same issue. Tickets opened for no valid reason will be closed without a response.\n\n" +
     "If you encountered a bug, please report it in [feedback](https://discord.com/channels/1400118983885324411/1407743733788835840)."
@@ -42,15 +42,15 @@ export async function execute(interaction) {
         .setValue("discord_support"),
       new StringSelectMenuOptionBuilder()
         .setLabel("Website Support")
-        .setEmoji("<:loldatabug:1413989888490995822>")
+        .setEmoji("<:loldatamod:1413069465658327112>")
         .setValue("website_support"),
       new StringSelectMenuOptionBuilder()
         .setLabel("Billing")
-        .setEmoji("<:premium:1413184780882809023>")
+        .setEmoji("<:loldatastar:1411951560438714470>")
         .setValue("billing"),
       new StringSelectMenuOptionBuilder()
         .setLabel("Other")
-        .setEmoji("<:other:1413989887085903955>")
+        .setEmoji("<:support:1410203531553669222>")
         .setValue("other")
     );
 
