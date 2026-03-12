@@ -39,14 +39,4 @@ export async function checkLevelUp(member, newExpPoints, guild) {
     await member.roles.add(roleId).catch(console.error);
   }
 
-  const allTierRoleIds = roleThresholds.map((r) => r.roleId);
-  const highestNewRoleId = rolesToAdd[rolesToAdd.length - 1].roleId;
-  const rolesToRemove = allTierRoleIds.filter(
-    (id) => id !== highestNewRoleId && member.roles.cache.has(id)
-  );
-
-  for (const roleId of rolesToRemove) {
-    await member.roles.remove(roleId).catch(console.error);
-  }
-
 }
