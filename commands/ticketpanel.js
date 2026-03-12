@@ -16,12 +16,12 @@ export async function execute(interaction) {
   const lines = "<:line:1413101899770626059>".repeat(27);
   const embed = new EmbedBuilder().setColor("#01D38E").setDescription(
     `## <:loldatasupport:1413069467776192593> Help Desk\n${lines}\nIf you need assistance, select the category that best describes your issue and fill in the short form.\n\nA member of the <:loldatasupport:1413069467776192593><@&${process.env.SUPPORT_ROLE_ID}> team or a <:loldatamod:1413069465658327112><@&${process.env.MOD_ROLE_ID}> will get back to you as soon as possible.\n## FAQs\n` +
-    "`How do I earn exp points on lolData's discord server?`\nYou can earn exp points by winning giveaways, chatting with other community members and being active in the server.\n\n" +
-    "`How do I check how many points I have?`\nYou can check your progress by typing /profile [(optional)username] in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934).\n\n" +
-    "`How do I check the Leaderboard?`\nYou can check the server leaderboard by typing /leaderboard in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934).\n\n" +
-    "`How do I check all the available commands?`\nYou can check the bot's commands by typing /help in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934). The list will be updated as new features come out.\n\n" +
-    "`How do I become a partner?`\nYou can apply for the partner program by opening a ticket in [partners](https://discord.com/channels/1400118983885324411/1410198632296349728). Keep in mind — you will need to meet some requirements before applying.\n\n" +
-    "`Where can I read informations on this project?`\n" +
+    "`1. How do I earn exp points?`\nYou can earn exp points by winning giveaways, chatting with other community members and being active in the server.\n\n" +
+    "`2. How do I check how many points I have?`\nYou can check your progress by typing /profile [(optional)username] in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934).\n\n" +
+    "`3. How do I check the Leaderboard?`\nYou can check the server leaderboard by typing /leaderboard in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934).\n\n" +
+    "`4. How do I check all the available commands?`\nYou can check the bot's commands by typing /help in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934). The list will be updated as new features come out.\n\n" +
+    "`5. How do I become a partner?`\nYou can apply for the partner program by opening a ticket in [partners](https://discord.com/channels/1400118983885324411/1410198632296349728). Keep in mind — you will need to meet some requirements before applying.\n\n" +
+    "`6. Where can I read about this project?`\n" +
     "You can read in depth informations about our project in [about](https://discord.com/channels/1400118983885324411/1410198427232501850) or consult the [documentation](https://loldata.cc/dashboard/documentation) on our website.\n\n### Keep in mind\nDo not open multiple tickets for the same issue. Tickets opened for no valid reason will be closed without a response.\n\nIf you encountered a bug, please report it in [feedback](https://discord.com/channels/1400118983885324411/1407743733788835840)."
   );
 
