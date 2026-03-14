@@ -275,7 +275,7 @@ export async function proSubmit(interaction) {
     ]);
 
     await proThread.send({
-      content: `Your application will be reviewed by the <@&1407639645918990339> team within 24 hours.`,
+      content: `Your application will be reviewed by the <@&${process.env.ADMIN_ROLE_ID}> team within 24 hours.`,
       embeds: [infoEmbed],
       components: [approveReject],
     });
@@ -617,7 +617,7 @@ export async function streamerSubmit(interaction) {
     ]);
 
     await streamerThread.send({
-      content: `Your application will be reviewed by the <@&1407639645918990339> team within 24 hours.`,
+      content: `Your application will be reviewed by the <@&${process.env.ADMIN_ROLE_ID}> team within 24 hours.`,
       embeds: [streamerEmbed],
       components: [approveRejectTwo],
     });
