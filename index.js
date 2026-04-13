@@ -28,6 +28,7 @@
     finishActiveGiveaways,
   } from "./utils/giveaways.js";
   import { supabase } from "./supabaseClient.js";
+  import { startRealtimeRoleSync } from "./utils/realtimeRoleSync.js";
   import messageCreateEvent from "./events/messageCreate.js";
   import guildMemberAddEvent from "./events/guildMemberAdd.js";
 
@@ -78,6 +79,7 @@
     }
 
     await startTimers();
+    startRealtimeRoleSync(client);
   });
 
   client.on(Events.InteractionCreate, async (interaction) => {
