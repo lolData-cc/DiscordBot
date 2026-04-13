@@ -29,17 +29,23 @@
   } from "./utils/giveaways.js";
   import { supabase } from "./supabaseClient.js";
   import messageCreateEvent from "./events/messageCreate.js";
+  import guildMemberAddEvent from "./events/guildMemberAdd.js";
 
   const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.MessageContent,
+      GatewayIntentBits.GuildMembers,
     ],
   });
 
   client.on(messageCreateEvent.name, (...args) =>
     messageCreateEvent.execute(...args)
+  );
+
+  client.on(guildMemberAddEvent.name, (...args) =>
+    guildMemberAddEvent.execute(...args)
   );
 
   const commandsPath = path.resolve("./commands");
