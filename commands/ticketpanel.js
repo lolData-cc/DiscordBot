@@ -39,11 +39,11 @@ export async function execute(interaction) {
         .setValue("website_support"),
       new StringSelectMenuOptionBuilder()
         .setLabel("Billing")
-        .setEmoji("<:loldatastar:1411951560438714470>")
+        .setEmoji("<:ldbilling:1494599022915227769>")
         .setValue("billing"),
       new StringSelectMenuOptionBuilder()
         .setLabel("Other")
-        .setEmoji("<:support:1410203531553669222>")
+        .setEmoji("<:ldhelp:1494595099143704736>")
         .setValue("other")
     );
 
