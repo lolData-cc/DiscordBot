@@ -15,7 +15,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   const lines = "<:line:1413101899770626059>".repeat(27);
   const embed = new EmbedBuilder().setColor("#01D38E").setDescription(
-    `## <:loldatasupport:1413069467776192593> Help Desk\n${lines}\nIf you need assistance, select the category that best describes your issue and fill in the short form.\n\nA member of the <:loldatasupport:1413069467776192593><@&${process.env.SUPPORT_ROLE_ID}> team or a <:loldatamod:1413069465658327112><@&${process.env.MOD_ROLE_ID}> will get back to you as soon as possible.\n## FAQs\n` +
+    `## <:ldhelp:1494595099143704736> Help Desk\n${lines}\nIf you need assistance, select the category that best describes your issue and fill in the short form.\n\nA member of the <:ldsupport:1494592731127877692><@&${process.env.SUPPORT_ROLE_ID}> team or a <:ldmod:1494592675784032379><@&${process.env.MOD_ROLE_ID}> will get back to you as soon as possible.\n## FAQs\n` +
     "`1. How do I earn exp points?`\nYou can earn exp points by winning giveaways, chatting with other community members and being active in the server.\n\n" +
     "`2. How do I check how many points I have?`\nYou can check your progress by typing /profile [(optional)username] in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934).\n\n" +
     "`3. How do I check the Leaderboard?`\nYou can check the server leaderboard by typing /leaderboard in [commands](https://discord.com/channels/1400118983885324411/1413091233860943934).\n\n" +
@@ -31,11 +31,11 @@ export async function execute(interaction) {
     .addOptions(
       new StringSelectMenuOptionBuilder()
         .setLabel("Discord Support")
-        .setEmoji("<:loldatasupport:1413069467776192593>")
+        .setEmoji("<:ldsupport:1494592731127877692>")
         .setValue("discord_support"),
       new StringSelectMenuOptionBuilder()
         .setLabel("Website Support")
-        .setEmoji("<:loldatamod:1413069465658327112>")
+        .setEmoji("<:ldmod:1494592675784032379>")
         .setValue("website_support"),
       new StringSelectMenuOptionBuilder()
         .setLabel("Billing")
