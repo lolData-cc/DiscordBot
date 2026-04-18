@@ -1,10 +1,32 @@
 import { supabase } from "../supabaseClient.js";
 import { checkLevelUp } from "../utils/levelUp.js";
+import { EmbedBuilder } from "discord.js";
+
+const URL_REGEX = /https?:\/\/[^\s]+/i;
 
 export default {
   name: "messageCreate",
   async execute(message) {
     if (message.author.bot) return;
+
+    if (message.guild && URL_REGEX.test(message.content)) {
+      const member = await message.guild.members.fetch(message.author.id).catch(() => null);
+      const supportRole = message.guild.roles.cache.get(process.env.SUPPORT_ROLE_ID);
+
+      if (member && supportRole && member.roles.highest.position < supportRole.position) {
+        await message.delete().catch(() => null);
+        const reply = await message.channel.send({
+          content: `<@${message.author.id}>`,
+          embeds: [
+            new EmbedBuilder()
+              .setColor("#01D38E")
+              .setDescription("You are not allowed to send links in this server."),
+          ],
+        });
+        setTimeout(() => reply.delete().catch(() => null), 5000);
+        return;
+      }
+    }
 
     if (message.mentions.has(message.client.user)) {
       const chance = Math.random();
