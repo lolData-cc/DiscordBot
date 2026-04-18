@@ -9,7 +9,8 @@ export default {
   async execute(message) {
     if (message.author.bot) return;
 
-    if (message.guild && URL_REGEX.test(message.content)) {
+    const LINK_RESTRICTED_CHANNELS = new Set(["1400118985223049338", "1413091233860943934", "1407743733788835840"]);
+    if (message.guild && LINK_RESTRICTED_CHANNELS.has(message.channelId) && URL_REGEX.test(message.content)) {
       const member = await message.guild.members.fetch(message.author.id).catch(() => null);
       const supportRole = message.guild.roles.cache.get(process.env.SUPPORT_ROLE_ID);
 
