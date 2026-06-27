@@ -115,6 +115,30 @@
         await ticketClose(interaction);
         return;
       }
+
+      if (interaction.customId === "verify") {
+        const member = await interaction.guild.members.fetch(interaction.user.id);
+        const roleId = "1407664698798768138";
+        if (member.roles.cache.has(roleId)) {
+          return interaction.reply({
+            embeds: [
+              new EmbedBuilder()
+                .setColor("#01D38E")
+                .setDescription("<:lddiscord:1494238438478844067> You are already verified."),
+            ],
+            ephemeral: true,
+          });
+        }
+        await member.roles.add(roleId);
+        return interaction.reply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor("#01D38E")
+              .setDescription("<:lddiscord:1494238438478844067> You have been successfully verified. Welcome to the server!"),
+          ],
+          ephemeral: true,
+        });
+      }
     }
 
     if (interaction.isChatInputCommand()) {
