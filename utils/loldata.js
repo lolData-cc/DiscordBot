@@ -3,7 +3,7 @@
 // Kept in one place because the alternative is twelve copies of the champion
 // map, the queue table and the "which lobby is this channel" lookup.
 
-import { supabase } from "../supabaseClient.js";
+import { supabase, supabaseBox } from "../supabaseClient.js";
 
 export const API = process.env.LOLDATA_API_URL || "https://api2.loldata.cc";
 export const CDN = "https://cdn2.loldata.cc";
@@ -137,7 +137,7 @@ export function profileUrl(region, name, tag) {
    A slash command knows only the channel it was typed in. The bridge is
    `scout_lobby_webhooks.channel_id`, filled in when the feed was connected. */
 export async function lobbyForChannel(channelId) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseBox
     .from("scout_lobby_webhooks")
     .select("lobby_slug, label")
     .eq("channel_id", channelId)
